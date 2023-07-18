@@ -1,0 +1,74 @@
+use bevy::prelude::*;
+
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, spawn_player)
+            .add_systems(Update, player_movement);
+    }
+}
+
+#[derive(Component)]
+struct Player;
+
+#[derive(Component)]
+struct Speed(f32);
+
+fn spawn_player(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let player = (
+        PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
+            material: materials.add(Color::BLUE.into()),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            ..default()
+        },
+        Player,
+        Speed(2.5),
+    );
+
+    commands.spawn(player);
+}
+
+fn player_movement(
+    time: Res<Time>,
+    keys: Res<Input<KeyCode>>,
+    mut player_q: Query<(&mut Transform, &Speed), With<Player>>,
+    cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
+) {
+    for (mut player_transform, player_speed) in player_q.iter_mut() {
+        let cam = match cam_q.get_single() {
+            Ok(c) => c,
+            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
+        };
+
+        let mut direction = Vec3::ZERO;
+
+        // forward
+        if keys.pressed(KeyCode::W) {
+            direction += cam.forward().normalize();
+        }
+
+        // back
+        if keys.pressed(KeyCode::S) {
+            direction += cam.back().normalize();
+        }
+
+        // left
+        if keys.pressed(KeyCode::A) {
+            direction += cam.left().normalize();
+        }
+
+        // right
+        if keys.pressed(KeyCode::D) {
+            direction += cam.right().normalize();
+        }
+
+        direction.y = 0.0;
+        player_transform.translation += player_speed.0 * direction * time.delta_seconds();
+    }
+}
