@@ -4,16 +4,8 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (spawn_camera, spawn_floor, spawn_light));
+        app.add_systems(Startup, (spawn_floor, spawn_light));
     }
-}
-
-fn spawn_camera(mut commands: Commands) {
-    let camera = Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    };
-    commands.spawn(camera);
 }
 
 fn spawn_floor(
