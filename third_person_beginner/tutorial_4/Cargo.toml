@@ -1,5 +1,5 @@
 [package]
-name = "third_person_2"
+name = "tutorial_4"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.11.0"
+bevy_third_person_camera = "0.1.0"
