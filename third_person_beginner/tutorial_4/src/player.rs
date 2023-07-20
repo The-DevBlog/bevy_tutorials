@@ -52,25 +52,26 @@ fn player_movement(
 
         // forward
         if keys.pressed(KeyCode::W) {
-            direction += cam.forward().normalize();
+            direction += cam.forward();
         }
 
         // back
         if keys.pressed(KeyCode::S) {
-            direction += cam.back().normalize();
+            direction += cam.back();
         }
 
         // left
         if keys.pressed(KeyCode::A) {
-            direction += cam.left().normalize();
+            direction += cam.left();
         }
 
         // right
         if keys.pressed(KeyCode::D) {
-            direction += cam.right().normalize();
+            direction += cam.right();
         }
 
         direction.y = 0.0;
-        player_transform.translation += player_speed.0 * direction * time.delta_seconds();
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        player_transform.translation += movement;
     }
 }
