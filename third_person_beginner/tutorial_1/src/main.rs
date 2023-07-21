@@ -10,9 +10,7 @@ fn main() {
         .run();
 }
 
-#[derive(Component)]
-struct Player;
-
+// SECOND
 fn spawn_camera(mut commands: Commands) {
     let camera = Camera3dBundle {
         transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -21,6 +19,7 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn(camera);
 }
 
+// FIRST
 fn spawn_floor(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -40,19 +39,17 @@ fn spawn_player(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let player = (
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-            material: materials.add(Color::BLUE.into()),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
-        Player,
-    );
+    let player = PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
+        material: materials.add(Color::BLUE.into()),
+        transform: Transform::from_xyz(0.0, 0.5, 0.0),
+        ..default()
+    };
 
     commands.spawn(player);
 }
 
+// THIRD
 fn spawn_light(mut commands: Commands) {
     let light = PointLightBundle {
         point_light: PointLight {
