@@ -42,14 +42,14 @@ fn spawn_objects(
 
     commands.spawn(create_obj(
         3.0,
-        Color::CRIMSON,
-        "Object 1".to_string(),
+        Color::RED,
+        "Red Cube".to_string(),
         (-4.5, 1.5, -4.5),
     ));
     commands.spawn(create_obj(
         2.0,
-        Color::AQUAMARINE,
-        "Object 2".to_string(),
+        Color::MIDNIGHT_BLUE,
+        "Blue Cube".to_string(),
         (5.3, 1.0, 5.7),
     ));
 }

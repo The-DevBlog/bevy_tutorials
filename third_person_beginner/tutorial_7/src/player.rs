@@ -25,9 +25,10 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
                 intensity: 4000.0,
                 outer_angle: 0.5,
                 inner_angle: 0.4,
+                shadows_enabled: true,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 0.25, 0.0),
+            transform: Transform::from_xyz(0.0, 0.25, -0.3),
             ..default()
         },
         Name::new("Flashlight"),

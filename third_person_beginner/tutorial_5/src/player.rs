@@ -17,13 +17,12 @@ struct Player;
 struct Speed(f32);
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
+    let flashlight = SpotLightBundle::default();
+
     let player = (
         SceneBundle {
             scene: assets.load("Player.gltf#Scene0"),
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.5, 0.0),
-                ..default()
-            },
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
         Player,
@@ -31,7 +30,9 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         Speed(2.5),
     );
 
-    commands.spawn(player);
+    commands.spawn(player).with_children(|parent| {
+        parent.spawn(flashlight);
+    });
 }
 
 fn player_movement(
