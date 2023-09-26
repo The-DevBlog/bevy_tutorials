@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::{Collider, RigidBody};
 
 pub struct WorldPlugin;
 
@@ -13,11 +14,14 @@ fn spawn_floor(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane::from_size(15.0))),
-        material: materials.add(Color::DARK_GREEN.into()),
-        ..default()
-    };
+    let floor = (
+        PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Plane::from_size(15.0))),
+            material: materials.add(Color::DARK_GREEN.into()),
+            ..default()
+        },
+        Collider::cuboid(7.5, 0.0, 7.5),
+    );
 
     commands.spawn(floor);
 }
@@ -44,18 +48,23 @@ fn spawn_objects(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let mut create_obj =
-        |size: f32, color: Color, name: String, xyz: (f32, f32, f32)| -> (PbrBundle, Name) {
-            (
-                PbrBundle {
-                    mesh: meshes.add(Mesh::from(shape::Cube::new(size))),
-                    material: materials.add(color.into()),
-                    transform: Transform::from_xyz(xyz.0, xyz.1, xyz.2),
-                    ..default()
-                },
-                Name::new(name),
-            )
-        };
+    let mut create_obj = |size: f32,
+                          color: Color,
+                          name: String,
+                          xyz: (f32, f32, f32)|
+     -> (PbrBundle, Name, Collider, RigidBody) {
+        (
+            PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Cube::new(size))),
+                material: materials.add(color.into()),
+                transform: Transform::from_xyz(xyz.0, xyz.1, xyz.2),
+                ..default()
+            },
+            Name::new(name),
+            Collider::cuboid(size / 2.0, size / 2.0, size / 2.0),
+            RigidBody::Dynamic,
+        )
+    };
 
     commands.spawn(create_obj(
         3.0,
