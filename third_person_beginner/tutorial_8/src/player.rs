@@ -12,10 +12,16 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Component)]
+struct IsJumping(bool);
+
+#[derive(Component)]
 struct Player;
 
 #[derive(Component)]
 struct Speed(f32);
+
+#[derive(Component)]
+struct Jump(f32);
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let flashlight = (
@@ -41,10 +47,13 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
+        ActiveEvents::COLLISION_EVENTS,
         Player,
         Name::new("Player"),
         ThirdPersonCameraTarget,
         Speed(2.5),
+        Jump(5.0),
+        IsJumping(false),
         LockedAxes::ROTATION_LOCKED_X | LockedAxes::ROTATION_LOCKED_Z,
         Collider::cylinder(0.5, 0.25),
         RigidBody::Dynamic,
@@ -58,10 +67,11 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
 fn player_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    mut player_q: Query<(&mut Transform, &Speed), With<Player>>,
+    mut player_q: Query<(&mut Transform, &Speed, &Jump, &mut IsJumping), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
+    mut collision_evr: EventReader<CollisionEvent>,
 ) {
-    for (mut player_transform, player_speed) in player_q.iter_mut() {
+    for (mut player_transform, player_speed, jump, mut is_jumping) in player_q.iter_mut() {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
             Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
@@ -92,6 +102,22 @@ fn player_movement(
         direction.y = 0.0;
         let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
         player_transform.translation += movement;
+
+        // stop jumping when collision is detected
+        for ev in collision_evr.iter() {
+            if let CollisionEvent::Started(handle1, handle2, handle3) = ev {
+                println!("{:?}", handle1);
+                println!("{:?}", handle2);
+                println!("{:?}", handle3);
+                is_jumping.0 = false;
+            }
+        }
+
+        // jump
+        if keys.just_pressed(KeyCode::F) || is_jumping.0 {
+            player_transform.translation.y += jump.0 * time.delta_seconds();
+            is_jumping.0 = true;
+        }
 
         // rotate player to face direction he is currently moving
         if direction.length_squared() > 0.0 {
