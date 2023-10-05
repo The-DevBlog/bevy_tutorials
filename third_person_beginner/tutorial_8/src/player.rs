@@ -12,7 +12,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Component)]
-struct IsJumping(bool);
+struct Grounded(bool);
 
 #[derive(Component)]
 struct Player;
@@ -52,8 +52,8 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         Name::new("Player"),
         ThirdPersonCameraTarget,
         Speed(2.5),
-        Jump(5.0),
-        IsJumping(false),
+        Jump(4.0),
+        Grounded(false),
         LockedAxes::ROTATION_LOCKED_X | LockedAxes::ROTATION_LOCKED_Z,
         Collider::cylinder(0.5, 0.25),
         RigidBody::Dynamic,
@@ -67,11 +67,13 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
 fn player_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    mut player_q: Query<(&mut Transform, &Speed, &Jump, &mut IsJumping), With<Player>>,
+    mut player_q: Query<(Entity, &mut Transform, &Speed, &Jump, &mut Grounded), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
-    mut collision_evr: EventReader<CollisionEvent>,
+    rapier_ctx: Res<RapierContext>,
 ) {
-    for (mut player_transform, player_speed, jump, mut is_jumping) in player_q.iter_mut() {
+    for (player_ent, mut player_transform, player_speed, jump, mut is_grounded) in
+        player_q.iter_mut()
+    {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
             Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
@@ -99,25 +101,32 @@ fn player_movement(
             direction += cam.right();
         }
 
-        direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
-        player_transform.translation += movement;
+        // ground the player if there is any contact made with another collider
+        let max_slope_angle = f32::to_radians(60.0);
+        'outer: for contact_pair in rapier_ctx.contacts_with(player_ent) {
+            if !contact_pair.has_any_active_contacts() {
+                continue;
+            }
 
-        // stop jumping when collision is detected
-        for ev in collision_evr.iter() {
-            if let CollisionEvent::Started(handle1, handle2, handle3) = ev {
-                println!("{:?}", handle1);
-                println!("{:?}", handle2);
-                println!("{:?}", handle3);
-                is_jumping.0 = false;
+            let invert = contact_pair.collider1() != player_ent;
+            for contact in contact_pair.manifolds() {
+                let normal = contact.normal() * if invert { -1. } else { 1. };
+                if Vec3::NEG_Y.angle_between(normal) < max_slope_angle {
+                    is_grounded.0 = true;
+                    break 'outer;
+                }
             }
         }
 
         // jump
-        if keys.just_pressed(KeyCode::F) || is_jumping.0 {
+        if keys.just_pressed(KeyCode::F) || !is_grounded.0 {
             player_transform.translation.y += jump.0 * time.delta_seconds();
-            is_jumping.0 = true;
+            is_grounded.0 = false;
         }
+
+        direction.y = 0.0;
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        player_transform.translation += movement;
 
         // rotate player to face direction he is currently moving
         if direction.length_squared() > 0.0 {
