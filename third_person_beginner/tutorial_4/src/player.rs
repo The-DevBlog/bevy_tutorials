@@ -23,8 +23,8 @@ fn spawn_player(
 ) {
     let player = (
         PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-            material: materials.add(Color::BLUE.into()),
+            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+            material: materials.add(Color::BLUE),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
@@ -38,7 +38,7 @@ fn spawn_player(
 
 fn player_movement(
     time: Res<Time>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut player_q: Query<(&mut Transform, &Speed), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
@@ -51,23 +51,23 @@ fn player_movement(
         let mut direction = Vec3::ZERO;
 
         // forward
-        if keys.pressed(KeyCode::W) {
-            direction += cam.forward();
+        if keys.pressed(KeyCode::KeyW) {
+            direction += *cam.forward();
         }
 
         // back
-        if keys.pressed(KeyCode::S) {
-            direction += cam.back();
+        if keys.pressed(KeyCode::KeyS) {
+            direction += *cam.back();
         }
 
         // left
-        if keys.pressed(KeyCode::A) {
-            direction += cam.left();
+        if keys.pressed(KeyCode::KeyA) {
+            direction += *cam.left();
         }
 
         // right
-        if keys.pressed(KeyCode::D) {
-            direction += cam.right();
+        if keys.pressed(KeyCode::KeyD) {
+            direction += *cam.right();
         }
 
         direction.y = 0.0;

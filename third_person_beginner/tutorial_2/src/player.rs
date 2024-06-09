@@ -14,8 +14,8 @@ fn spawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let player = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-        material: materials.add(Color::BLUE.into()),
+        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+        material: materials.add(Color::BLUE),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..default()
     };

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_third_person_camera::ThirdPersonCamera;
+use bevy_third_person_camera::{camera::Zoom, ThirdPersonCamera};
 
 pub struct CameraPlugin;
 
@@ -15,7 +15,10 @@ fn spawn_camera(mut commands: Commands) {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
-        ThirdPersonCamera::default(),
+        ThirdPersonCamera {
+            zoom: Zoom::new(3.0, 8.0),
+            ..default()
+        },
     );
     commands.spawn(camera);
 }

@@ -29,7 +29,7 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
             spot_light: SpotLight {
                 color: Color::rgba(1.0, 1.0, 0.47, 1.0),
                 range: 10.0,
-                intensity: 4000.0,
+                intensity: 4000.0 * 1000.0,
                 outer_angle: 0.5,
                 inner_angle: 0.4,
                 shadows_enabled: true,
@@ -66,7 +66,7 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
 
 fn player_movement(
     time: Res<Time>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut player_q: Query<(Entity, &mut Transform, &Speed, &Jump, &mut Grounded), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
     rapier_ctx: Res<RapierContext>,
@@ -82,23 +82,23 @@ fn player_movement(
         let mut direction = Vec3::ZERO;
 
         // forward
-        if keys.pressed(KeyCode::W) {
-            direction += cam.forward();
+        if keys.pressed(KeyCode::KeyW) {
+            direction += *cam.forward();
         }
 
         // back
-        if keys.pressed(KeyCode::S) {
-            direction += cam.back();
+        if keys.pressed(KeyCode::KeyS) {
+            direction += *cam.back();
         }
 
         // left
-        if keys.pressed(KeyCode::A) {
-            direction += cam.left();
+        if keys.pressed(KeyCode::KeyA) {
+            direction += *cam.left();
         }
 
         // right
-        if keys.pressed(KeyCode::D) {
-            direction += cam.right();
+        if keys.pressed(KeyCode::KeyD) {
+            direction += *cam.right();
         }
 
         // ground the player if there is any contact made with another collider
