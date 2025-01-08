@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
+use bevy_color::palettes::css::{DARK_GREEN, MIDNIGHT_BLUE, RED};
+const COLOR_DARK_GREEN: Color = Color::Srgba(DARK_GREEN);
+const COLOR_RED: Color = Color::Srgba(RED);
+const COLOR_MIDNIGHT_BLUE: Color = Color::Srgba(MIDNIGHT_BLUE);
+
 pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
@@ -15,11 +20,10 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = (
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-            material: materials.add(Color::DARK_GREEN),
-            ..default()
-        },
+        (
+            Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
+            MeshMaterial3d(materials.add(COLOR_DARK_GREEN)),
+        ),
         Collider::cuboid(7.5, 0.0, 7.5),
     );
 
@@ -28,15 +32,14 @@ fn spawn_floor(
 
 fn spawn_light(mut commands: Commands) {
     let light = (
-        PointLightBundle {
-            point_light: PointLight {
-                color: Color::rgba(0.98, 0.59, 0.0, 1.0),
+        (
+            PointLight {
+                color: Color::srgba(0.98, 0.59, 0.0, 1.0),
                 intensity: 100.0 * 1000.0,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 5.0, 0.0),
-            ..default()
-        },
+            Transform::from_xyz(0.0, 5.0, 0.0),
+        ),
         Name::new("PointLight"),
     );
 
@@ -52,14 +55,13 @@ fn spawn_objects(
                           color: Color,
                           name: String,
                           xyz: (f32, f32, f32)|
-     -> (PbrBundle, Name, Collider, RigidBody) {
+     -> (_, Name, Collider, RigidBody) {
         (
-            PbrBundle {
-                mesh: meshes.add(Cuboid::new(size, size, size)),
-                material: materials.add(color),
-                transform: Transform::from_xyz(xyz.0, xyz.1, xyz.2),
-                ..default()
-            },
+            (
+                Mesh3d(meshes.add(Cuboid::new(size, size, size))),
+                MeshMaterial3d(materials.add(color)),
+                Transform::from_xyz(xyz.0, xyz.1, xyz.2),
+            ),
             Name::new(name),
             Collider::cuboid(size / 2.0, size / 2.0, size / 2.0),
             RigidBody::Dynamic,
@@ -68,13 +70,13 @@ fn spawn_objects(
 
     commands.spawn(create_obj(
         3.0,
-        Color::RED,
+        COLOR_RED,
         "Red Cube".to_string(),
         (-4.5, 1.5, -4.5),
     ));
     commands.spawn(create_obj(
         2.0,
-        Color::MIDNIGHT_BLUE,
+        COLOR_MIDNIGHT_BLUE,
         "Blue Cube".to_string(),
         (5.3, 1.0, 5.7),
     ));
