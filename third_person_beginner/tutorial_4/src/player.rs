@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 use bevy_third_person_camera::ThirdPersonCameraTarget;
 
+use bevy_color::palettes::css::BLUE;
+const COLOR_BLUE: Color = Color::Srgba(BLUE);
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -22,12 +25,11 @@ fn spawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let player = (
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(Color::BLUE),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
+        (
+            Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
+            MeshMaterial3d(materials.add(COLOR_BLUE)),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
         Player,
         ThirdPersonCameraTarget,
         Speed(2.5),
@@ -45,7 +47,7 @@ fn player_movement(
     for (mut player_transform, player_speed) in player_q.iter_mut() {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
-            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
+            Err(e) => panic!("Error retrieving camera: {}", e),
         };
 
         let mut direction = Vec3::ZERO;
@@ -71,7 +73,7 @@ fn player_movement(
         }
 
         direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_secs();
         player_transform.translation += movement;
     }
 }
