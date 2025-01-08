@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+use bevy_color::palettes::css::BLUE;
+const COLOR_BLUE: Color = Color::Srgba(BLUE);
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -21,12 +24,11 @@ fn spawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let player = (
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(Color::BLUE),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
+        (
+            Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
+            MeshMaterial3d(materials.add(COLOR_BLUE)),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
         Player,
         Speed(2.5),
     );
@@ -69,7 +71,7 @@ fn player_movement(
         }
 
         direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_secs();
         player_transform.translation += movement;
     }
 }
