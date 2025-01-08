@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.13.2"
-bevy_third_person_camera = "0.1.10"
+bevy = "0.15.1"
+bevy_color = "0.15.2"
+bevy_third_person_camera = "0.2.0"
