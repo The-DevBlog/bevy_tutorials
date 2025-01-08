@@ -1,5 +1,8 @@
 use bevy::{prelude::*, DefaultPlugins};
 
+const COLOR_DARK_GREEN: Color = Color::rgb(0.0, 0.5, 0.0);
+const COLOR_BLUE: Color = Color::rgb(0.0, 0.0, 1.0);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -25,7 +28,7 @@ fn spawn_floor(
 ) {
     let floor = PbrBundle {
         mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-        material: materials.add(Color::DARK_GREEN),
+        material: materials.add(COLOR_DARK_GREEN),
         ..default()
     };
 
@@ -39,7 +42,7 @@ fn spawn_player(
 ) {
     let player = PbrBundle {
         mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-        material: materials.add(Color::BLUE),
+        material: materials.add(COLOR_BLUE),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..default()
     };
