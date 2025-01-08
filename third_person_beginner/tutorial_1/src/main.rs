@@ -14,10 +14,11 @@ fn main() {
 }
 
 fn spawn_camera(mut commands: Commands) {
-    let camera = Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    };
+    let camera = (
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        );
+
     commands.spawn(camera);
 }
 
@@ -26,11 +27,10 @@ fn spawn_floor(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let floor = PbrBundle {
-        mesh: Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
-        material: MeshMaterial3d(materials.add(COLOR_DARK_GREEN)),
-        ..default()
-    };
+    let floor = (
+        Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
+        MeshMaterial3d(materials.add(COLOR_DARK_GREEN)),
+    );
 
     commands.spawn(floor);
 }
@@ -40,25 +40,23 @@ fn spawn_player(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let player = PbrBundle {
-        mesh: Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
-        material: MeshMaterial3d(materials.add(COLOR_BLUE)),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    };
+    let player = (
+        Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
+        MeshMaterial3d(materials.add(COLOR_BLUE)),
+        Transform::from_xyz(0.0, 0.5, 0.0),
+    );
 
     commands.spawn(player);
 }
 
 fn spawn_light(mut commands: Commands) {
-    let light = PointLightBundle {
-        point_light: PointLight {
+    let light = (
+        PointLight {
             intensity: 2000.0 * 1000.0,
             ..default()
         },
-        transform: Transform::from_xyz(0.0, 5.0, 0.0),
-        ..default()
-    };
+        Transform::from_xyz(0.0, 5.0, 0.0),
+    );
 
     commands.spawn(light);
 }
