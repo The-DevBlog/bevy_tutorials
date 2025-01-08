@@ -45,7 +45,7 @@ fn player_movement(
     for (mut player_transform, player_speed) in player_q.iter_mut() {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
-            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
+            Err(e) => panic!("Error retrieving camera: {}", e),
         };
 
         let mut direction = Vec3::ZERO;
