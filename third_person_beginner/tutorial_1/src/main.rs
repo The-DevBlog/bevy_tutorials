@@ -27,8 +27,8 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-        material: materials.add(COLOR_DARK_GREEN),
+        mesh: Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
+        material: MeshMaterial3d(materials.add(COLOR_DARK_GREEN)),
         ..default()
     };
 
@@ -41,8 +41,8 @@ fn spawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let player = PbrBundle {
-        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-        material: materials.add(COLOR_BLUE),
+        mesh: Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
+        material: MeshMaterial3d(materials.add(COLOR_BLUE)),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..default()
     };
