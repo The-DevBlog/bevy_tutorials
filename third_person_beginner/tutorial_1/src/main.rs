@@ -1,7 +1,8 @@
 use bevy::{prelude::*, DefaultPlugins};
 
-const COLOR_DARK_GREEN: Color = Color::rgb(0.0, 0.5, 0.0);
-const COLOR_BLUE: Color = Color::rgb(0.0, 0.0, 1.0);
+use bevy_color::palettes::css::{BLUE, DARK_GREEN};
+const COLOR_DARK_GREEN: Color = Color::Srgba(DARK_GREEN);
+const COLOR_BLUE: Color = Color::Srgba(BLUE);
 
 fn main() {
     App::new()
