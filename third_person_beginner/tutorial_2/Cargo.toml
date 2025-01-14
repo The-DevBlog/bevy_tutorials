@@ -7,4 +7,3 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.15.1"
-bevy_color = "0.15.2"

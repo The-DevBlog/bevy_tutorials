@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use bevy_color::palettes::css::DARK_GREEN;
-const COLOR_DARK_GREEN: Color = Color::Srgba(DARK_GREEN);
+use bevy::color::palettes::css;
+const COLOR_DARK_GREEN: Color = Color::Srgba(css::DARK_GREEN);
 
 pub struct WorldPlugin;
 

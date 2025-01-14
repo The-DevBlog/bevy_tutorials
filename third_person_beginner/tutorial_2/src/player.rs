@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use bevy_color::palettes::css::BLUE;
-const COLOR_BLUE: Color = Color::Srgba(BLUE);
+use bevy::color::palettes::css;
+const COLOR_BLUE: Color = Color::Srgba(css::BLUE);
 
 pub struct PlayerPlugin;
 

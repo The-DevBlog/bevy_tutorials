@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use bevy_color::palettes::css::{DARK_GREEN, MIDNIGHT_BLUE, RED};
-const COLOR_DARK_GREEN: Color = Color::Srgba(DARK_GREEN);
-const COLOR_RED: Color = Color::Srgba(RED);
-const COLOR_MIDNIGHT_BLUE: Color = Color::Srgba(MIDNIGHT_BLUE);
+use bevy::color::palettes::css;
+const COLOR_DARK_GREEN: Color = Color::Srgba(css::DARK_GREEN);
+const COLOR_RED: Color = Color::Srgba(css::RED);
+const COLOR_MIDNIGHT_BLUE: Color = Color::Srgba(css::MIDNIGHT_BLUE);
 
 pub struct WorldPlugin;
 
