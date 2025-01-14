@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+use bevy::color::palettes::css;
+const COLOR_DARK_GREEN: Color = Color::Srgba(css::DARK_GREEN);
+
 pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
@@ -13,26 +16,24 @@ fn spawn_floor(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-        material: materials.add(Color::DARK_GREEN),
-        ..default()
-    };
+    let floor = (
+        Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
+        MeshMaterial3d(materials.add(COLOR_DARK_GREEN)),
+    );
 
     commands.spawn(floor);
 }
 
 fn spawn_light(mut commands: Commands) {
     let light = (
-        PointLightBundle {
-            point_light: PointLight {
-                color: Color::rgba(0.98, 0.59, 0.0, 1.0),
+        (
+            PointLight {
+                color: Color::srgba(0.98, 0.59, 0.0, 1.0),
                 intensity: 100.0 * 1000.0,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 5.0, 0.0),
-            ..default()
-        },
+            Transform::from_xyz(0.0, 5.0, 0.0),
+        ),
         Name::new("PointLight"),
     );
 

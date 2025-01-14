@@ -25,9 +25,9 @@ struct Jump(f32);
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let flashlight = (
-        SpotLightBundle {
-            spot_light: SpotLight {
-                color: Color::rgba(1.0, 1.0, 0.47, 1.0),
+        (
+            SpotLight {
+                color: Color::srgba(1.0, 1.0, 0.47, 1.0),
                 range: 10.0,
                 intensity: 4000.0 * 1000.0,
                 outer_angle: 0.5,
@@ -35,18 +35,17 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
                 shadows_enabled: true,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 0.25, -0.3),
-            ..default()
-        },
+            Transform::from_xyz(0.0, 0.25, -0.3),
+        ),
         Name::new("Flashlight"),
     );
 
     let player = (
-        SceneBundle {
-            scene: assets.load("Player.gltf#Scene0"),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
+        (
+            SceneRoot(assets.load("Player.gltf#Scene0")),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
+        RapierContext::default(),
         ActiveEvents::COLLISION_EVENTS,
         Player,
         Name::new("Player"),
@@ -64,19 +63,29 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     });
 }
 
+#[allow(clippy::type_complexity)]
 fn player_movement(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
-    mut player_q: Query<(Entity, &mut Transform, &Speed, &Jump, &mut Grounded), With<Player>>,
+    mut player_q: Query<
+        (
+            Entity,
+            &mut Transform,
+            &Speed,
+            &Jump,
+            &mut Grounded,
+            &RapierContext,
+        ),
+        With<Player>,
+    >,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
-    rapier_ctx: Res<RapierContext>,
 ) {
-    for (player_ent, mut player_transform, player_speed, jump, mut is_grounded) in
+    for (player_ent, mut player_transform, player_speed, jump, mut is_grounded, rapier_ctx) in
         player_q.iter_mut()
     {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
-            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
+            Err(e) => panic!("Error retrieving camera: {}", e),
         };
 
         let mut direction = Vec3::ZERO;
@@ -103,8 +112,8 @@ fn player_movement(
 
         // ground the player if there is any contact made with another collider
         let max_slope_angle = f32::to_radians(60.0);
-        'outer: for contact_pair in rapier_ctx.contacts_with(player_ent) {
-            if !contact_pair.has_any_active_contacts() {
+        'outer: for contact_pair in rapier_ctx.contact_pairs_with(player_ent) {
+            if !contact_pair.has_any_active_contact() {
                 continue;
             }
 
@@ -119,13 +128,13 @@ fn player_movement(
         }
 
         // jump
-        if keys.just_pressed(KeyCode::F) || !is_grounded.0 {
-            player_transform.translation.y += jump.0 * time.delta_seconds();
+        if keys.just_pressed(KeyCode::KeyF) || !is_grounded.0 {
+            player_transform.translation.y += jump.0 * time.delta_secs();
             is_grounded.0 = false;
         }
 
         direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_secs();
         player_transform.translation += movement;
 
         // rotate player to face direction he is currently moving
